@@ -1,0 +1,15 @@
+/*
+	Main CSS for my network visualization project.
+*/
+
+body, html, #viz {
+  padding: 0px 0px 0px 0px;
+  margin: 0px 0px 0px 0px;
+  height: 100%;
+  width: 100%;
+}
+
+#viz {
+  height: 80%;
+  /*background-color:  yellow;*/
+}

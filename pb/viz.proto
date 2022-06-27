@@ -1,0 +1,52 @@
+syntax = "proto3";
+
+// protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative viz.proto
+
+package pb;
+option go_package = "./pb";
+// For including time object in packet protobuf struct
+import "google/protobuf/timestamp.proto";
+
+//======================================================
+// Host data
+
+message NetworkInterface {
+	string Name = 1;
+	string IPAddress = 2;
+}
+
+message Host {
+	string Hostname = 1;
+	string OS = 2;
+	string Architecture = 3;
+	string MachineID = 4;
+	repeated NetworkInterface Interfaces = 5;
+}
+
+//======================================================
+// Packet data
+
+message Packet {
+	string Protocol = 1;
+	string SrcAddr = 2;
+	string DstAddr = 3;
+	int32 SrcPort = 4;
+	int32 DstPort = 5;
+	google.protobuf.Timestamp Timestamp = 6;
+	int32 PktSize = 7;
+	string MachineID = 8;
+}
+
+message Reply {
+	string Message = 1;
+}
+
+//======================================================
+
+// Client-side streaming RPC
+
+service Viz {
+	rpc Collect(stream Packet) returns (Reply) {}
+	rpc CheckIn (Host) returns (Reply) {}
+}
+
