@@ -1,0 +1,10 @@
+configfile: server.yml
+dbaddress: localhost
+dbpassword: mysecretpassword
+dbport: "5432"
+dbssl: false
+dbusername: viz
+debug: false
+outputfile: server.log
+port: "1533"
+websocketport: "8000"

@@ -1,0 +1,8 @@
+configfile: agent.yml
+debug: false
+filter: ""
+interface: ""
+operatingsystem: ""
+outputfile: agent.log
+serveraddress: localhost:1533
+snaplength: "262144"
