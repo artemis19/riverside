@@ -123,10 +123,13 @@ func Listen(cmd *cobra.Command, args []string) {
 	}
 
 	for _, interfaceName := range interfaces {
-		if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") {
-			// Ignore virtual, docker, and loopback interfaces
-			continue
-		}
+		// This was removes virtual, docker, and loopback interfaces.
+		// If you would like to listen on these, simply add them in.
+		// if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") {
+		// 	// Ignore virtual, docker, and loopback interfaces
+		// 	continue
+		// }
+		
 		// Add every interface to our group
 		wg.Add(1)
 		defer wg.Done()

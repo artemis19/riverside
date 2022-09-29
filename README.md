@@ -18,7 +18,7 @@ You can download the latest pre-compiled binaries in the Releases section of thi
 
 ## Agent
 
-Riverside uses Golang agents deployed on internal network hosts to collect traffic. By default, the agent is set to listen on all interfaces unless otherwise specified. All agent logging will be saved in an `agent.log` file in the `riverside/agent` folder.
+Riverside uses Golang agents deployed on internal network hosts to collect traffic. All agent logging will be saved in an `agent.log` file in the `riverside/agent` folder.
 
 ### Configuration
 
@@ -26,9 +26,7 @@ The agent reads from `agent.yml`, and if one does not already exist, it will be 
 
 If you would like to compile the binaries natively, please follow the below instructions depending on the OS.
 
-### Linux
-
-There are some dependencies that will be required to compile the agent natively on your host.
+The `agent` has the following commands with accompanying options when running:
 
 ```sh
 ./agent -h
@@ -52,6 +50,21 @@ Flags:
 
 Use "agent [command] --help" for more information about a command.
 ```
+
+As a note, I listen on all interfaces, but if you uncomment this line, you will only listen on the primary interfaces.
+
+```go
+// This was removes virtual, docker, and loopback interfaces.
+// If you would like to listen on these, simply add them in.
+if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") {
+  // Ignore virtual, docker, and loopback interfaces
+  continue
+}
+```
+
+### Linux
+
+There are some dependencies that will be required to compile the agent natively on your host.
 
 #### Dependencies
 
@@ -111,7 +124,7 @@ Use the below syntax to run the agent and listen on a Linux host's network inter
 ./agent listen -s localhost:1533
 ```
 
-You will likely need root privileges to run the agent as it needs permission to capture traffic on the host interfaces.
+You will need root privileges to run the agent as it needs permission to capture traffic on the host interfaces.
 
 ### Windows
 
@@ -141,9 +154,9 @@ Use the below syntax to run the agent and listen on a Windows host's network int
 ./agent listen -s localhost:1533
 ```
 
-To run the agent on Windows, you will likely need administrator privileges to capture traffic on the host interfaces.
+To run the agent on Windows, you will need administrator privileges to capture traffic on the host interfaces.
 
-### Database
+## Database
 
 I use an ORM to handle database operations with the [GORM libray](https://gorm.io/). The following go dependencies may need to be installed before the server binary will compile correctly.
 
@@ -154,7 +167,13 @@ go get -u gorm.io/driver/postgres
 
 The driver for the database type can be changed depending on your needs or preferences in the `server/database` folder.
 
-### Server
+For local testing, you can set up a `postgres` Docker instance:
+
+```sh
+docker run -p 5432:5432 -e POSTGRES_USER=viz -e POSTGRES_PASSWORD=password postgres
+```
+
+## Server
 
 The server reads from `server.yml`, and if one does not already exist, it will be created when the server is first run. An example is included in this repository as `server.yml.example`. All server logging will be saved in an `server.log` file in the `riverside/server` folder.
 
@@ -166,7 +185,38 @@ Navigate to `riverside/server` and run the following:
 go build
 ```
 
-The server binary can be run with the following line as long as a database is currently running and specified in the configuration file.
+The `server` has the following commands with accompanying options when running:
+
+```sh
+./server -h
+Server to store agent traffic
+
+Usage:
+  server [flags]
+  server [command]
+
+Available Commands:
+  config      Show configuration settings
+  help        Help about any command
+
+Flags:
+  -c, --configFile string      Location of config file to read from (default "server.yml")
+  -a, --dbAddress string       Postgres database address (default "localhost")
+  -p, --dbPassword string      Postgres database password (default "mysecretpassword")
+  -b, --dbPort string          Postgres database port (default "5432")
+  -s, --dbSSL                  Turn Postgres SSL mode on
+  -u, --dbUsername string      Postgres database user (default "viz")
+  -d, --debug                  Turn debug mode on
+  -h, --help                   help for server
+  -o, --outputFile string      Location of log file output (default "server.log")
+  -l, --port string            Port for server to listen on (default "1533")
+  -v, --version                version for server
+  -w, --websocketPort string   Websocker server listening port (default "8000")
+
+Use "server [command] --help" for more information about a command.
+```
+
+The server binary can be run with the following line as long as a database is currently running and correctly specified in the configuration file.
 
 ```sh
 ./server
