@@ -89,19 +89,33 @@ export PATH="$PATH:$(go env GOPATH)/bin"
 
 #### DPI Dependencies
 
-I use the [go-dpi library](https://github.com/mushorg/go-dpi/wiki/Installation-guide) for this project on top of [gopacket](https://github.com/google/gopacket). Because of this, there are some extra dependencies if you wish to compile this on your own versus using the pre-compiled binaries provided. DPI is only supported for Linux agents at the moment.
+I use the [go-dpi library](https://github.com/mushorg/go-dpi/wiki/Installation-guide) for this project on top of [gopacket](https://github.com/google/gopacket). Because of this, there are some extra dependencies if you wish to compile this on your own versus using the pre-compiled binaries provided. Currently, DPI is only supported for Linux agents.
 
 ```sh
-sudo bash -c 'echo "deb http://packages.wand.net.nz trusty main" | tee -a /etc/apt/sources.list'
-sudo bash -c 'curl https://packages.wand.net.nz/keyring.gpg -o /etc/apt/trusted.gpg.d/wand.gpg'
+curl -1sLf 'https://dl.cloudsmith.io/public/wand/libwandio/cfg/setup/bash.deb.sh' | bash
+curl -1sLf 'https://dl.cloudsmith.io/public/wand/libwandder/cfg/setup/bash.deb.sh' | bash
+curl -1sLf 'https://dl.cloudsmith.io/public/wand/libtrace/cfg/setup/bash.deb.sh' | bash
+curl -1sLf 'https://dl.cloudsmith.io/public/wand/libflowmanager/cfg/setup/bash.deb.sh' | bash
+curl -1sLf 'https://dl.cloudsmith.io/public/wand/libprotoident/cfg/setup/bash.deb.sh' | bash
 
 sudo apt update
-sudo apt -y install libflowmanager
-sudo apt -y install libtrace4 libtrace4-dev
-sudo apt -y install liblinear4 liblinear-dev libprotoident libprotoident-dev autoconf libtool
-
+sudo apt install -y liblinear4 liblinear-dev libtrace4-dev libtrace4 autoconf libtool git make build-essential
 git clone --branch 3.2-stable https://github.com/ntop/nDPI/ /tmp/nDPI
-cd /tmp/nDPI && ./autogen.sh && ./configure && make && sudo make install && cd -
+cd /tmp/nDPI && ./autogen.sh && ./configure && make && make install && cd -
+
+git clone https://github.com/LibtraceTeam/libflowmanager /opt/libflowmanager
+cd /opt/libflowmanager
+./bootstrap.sh
+./configure
+make
+make install
+
+git clone https://github.com/LibtraceTeam/libprotoident /opt/libprotoident
+cd /opt/libprotoident
+./bootstrap.sh
+./configure
+make
+make install
 ```
 
 When building, you will need to include the specific header file for the `liblinear` dependency:
