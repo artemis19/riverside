@@ -39,21 +39,22 @@ type RemoteHost struct {
 
 // Communication b/w hosts or "edges" on the visualization
 type NetFlow struct {
-	ID           uint          `json:"id" gorm:"primaryKey"`
-	CreatedAt    sqltime.Time  `json:"created_at" gorm:"type:timestamp"`
-	UpdatedAt    sqltime.Time  `json:"updated_at" gorm:"type:timestamp"`
-	DeletedAt    *sqltime.Time `json:"deleted_at" gorm:"type:timestamp"`
-	HostID       string        `json:"host_id"`        // maps to Host MachineID for primary key
-	RemoteHostID string        `json:"remote_host_id"` // maps to RemotHost ID for primary key
-	SrcAddress   string        `json:"src_address"`
-	DstAddress   string        `json:"dst_address"`
-	SrcPort      int           `json:"src_port"`
-	DstPort      int           `json:"dst_port"`
-	Throughput   int           `json:"throughput"`
-	Direction    string        `json:"direction"`
-	Protocol     string        `json:"protocol"`
-	StartTime    sqltime.Time  `json:"start_time"`
-	EndTime      sqltime.Time  `json:"end_time"`
+	ID            uint          `json:"id" gorm:"primaryKey"`
+	CreatedAt     sqltime.Time  `json:"created_at" gorm:"type:timestamp"`
+	UpdatedAt     sqltime.Time  `json:"updated_at" gorm:"type:timestamp"`
+	DeletedAt     *sqltime.Time `json:"deleted_at" gorm:"type:timestamp"`
+	HostID        string        `json:"host_id"`        // maps to Host MachineID for primary key
+	RemoteHostID  string        `json:"remote_host_id"` // maps to RemotHost ID for primary key
+	OriginAddress string        `json:"origin_address"`
+	SrcAddress    string        `json:"src_address"`
+	DstAddress    string        `json:"dst_address"`
+	SrcPort       int           `json:"src_port"`
+	DstPort       int           `json:"dst_port"`
+	Throughput    int           `json:"throughput"`
+	Direction     string        `json:"direction"`
+	Protocol      string        `json:"protocol"`
+	StartTime     sqltime.Time  `json:"start_time"`
+	EndTime       sqltime.Time  `json:"end_time"`
 }
 
 // Overrides default GORM table naming schema

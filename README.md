@@ -8,11 +8,40 @@ Riverside provides a web-based, dynamic network security visualization of real-t
 
 ## Running Riverside
 
-*__Important Note: Riverside's frontend visualization is still being developed and tested. I will be updating this repository in January of 2023.__*
+*__Important Note: Riverside is still being actively developed and tested in various environments.__*
 
 This tool uses gRPC functionality to communicate between a server and agent-installed hosts. Protocol buffers are used to structure and serialize data for agent and server communications. The agent and server binaries are written in Golang and have been tested successfully on Windows and various Linux architectures. The GORM library was used to handle all database functionality, and the supported database type is Postgres but can be easily changed with one line in the server source code. The client, or frontend, communicates with the server via the Gorilla WebSockets library to display batched data in a web-based network visualization.
 
-## Binaries
+
+## Frontend Visualization
+
+The frontend layout was built using the [vis.js](https://visjs.org/) library along with custom Javascript code all contained within the `frontend` folder in this project. Agents, or internal hosts, will show up as cyan-colored nodes by default with remote, or external hosts, being grey. The timeline on the bottom controls what moment in time the visualization is displaying. Nodes will be connected with links that show whether traffic is to or from an agent node or bidirectional between two hosts. Communication is colored based on the protocol and edge thickness is correlated to the amount of traffic.
+
+### Riverside Deployment
+
+To run the frontend locally, you will just need to run a local web server, like the below, in the `frontend` folder:
+
+```python
+python3 -m http.server 9000
+```
+
+If you wish to host this live on a publicly-accessible web server, please follow the below instructions. This was done using a Let's Encrypt certificate on a Digital Ocean droplet. _Some changes may be needed if using a different CA or deployment method._
+
+You will need to change `ListenAndServe` to `ListenAndServeTLS` in `server/websocket.go` to the following line:
+
+```go
+// log.Fatal(http.ListenAndServe(bind, nil))
+log.Fatal(http.ListenAndServeTLS(bind, "/etc/letsencrypt/live/www.riverside-vis.dev/fullchain.pem", "/etc/letsencrypt/live/www.riverside-vis.dev/privkey.pem", nil))
+```
+
+I then had to change this line in `frontend/static/js/websocket_comms.js` to the following on my public droplet to enable TLS through the Websocket protocol:
+
+```js
+// let ws = new WebSocket("ws://localhost:8000/ws")
+let ws = new WebSocket("wss://riverside-vis.dev:8000/ws")
+```
+
+## Riverside Binaries
 
 You can download the latest pre-compiled binaries in the Releases section of this Github repository.
 
@@ -51,14 +80,13 @@ Flags:
 Use "agent [command] --help" for more information about a command.
 ```
 
-As a note, I listen on all interfaces, but if you uncomment this line, you will only listen on the primary interfaces.
+As a note, I listen listen on all interfaces by default, but if you uncomment this line, you will only listen on the primary interfaces.
 
 ```go
 // This was removes virtual, docker, and loopback interfaces.
-// If you would like to listen on these, simply add them in.
-if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") {
-  // Ignore virtual, docker, and loopback interfaces
-  continue
+if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") || strings.HasPrefix(interfaceName, "br-") {
+ // Ignore virtual, docker, and loopback interfaces
+ continue
 }
 ```
 

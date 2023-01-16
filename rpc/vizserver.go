@@ -244,7 +244,7 @@ func sendWSAgent(data database.Host) {
 func HandleNetFlow(packet *pb.Packet, remoteHostIP string) {
 	log.Printf("Netflow sees packet: %v", packet)
 	// From the perspective of the agent who initiates the traffic
-	var remoteHostID, srcIP, dstIP, direction string
+	var originAddress, remoteHostID, srcIP, dstIP, direction string
 	var srcPort, dstPort int
 	// For calculating traffic in our "window" to incorporate the timeline and calculate throughput
 	// Set current packet time and the previous second
@@ -297,6 +297,7 @@ func HandleNetFlow(packet *pb.Packet, remoteHostIP string) {
 				dstPort = int(packet.SrcPort)
 				srcPort = int(packet.DstPort)
 				direction = "from"
+				originAddress = dstIP
 				log.Printf("Netflow: FROM perspective with remoteHostID '%v'", remoteHostID)
 
 				// Bidirectional check
@@ -335,6 +336,7 @@ func HandleNetFlow(packet *pb.Packet, remoteHostIP string) {
 				dstPort = int(packet.DstPort)
 				srcPort = int(packet.SrcPort)
 				direction = "to"
+				originAddress = srcIP
 				log.Printf("Netflow: TO perspective with remoteHostID '%v'", remoteHostID)
 
 				// Temporary check
@@ -388,8 +390,10 @@ func HandleNetFlow(packet *pb.Packet, remoteHostIP string) {
 		// If A -> B, TO
 		// If B -> A, FROM
 		direction = "from"
+		originAddress = remoteHostIP
 		if packet.DstAddr == remoteHostIP {
 			direction = "to"
+			originAddress = srcIP
 		}
 
 		if isInSlice(remoteHostID, prevRemoteIDs) {
@@ -413,19 +417,20 @@ func HandleNetFlow(packet *pb.Packet, remoteHostIP string) {
 		}
 	}
 
-	// Agent who initiates the traffic is the "source" here
+	// Origin address tracks who originates the communication
 	flow := &database.NetFlow{
-		HostID:       packet.MachineID,
-		RemoteHostID: remoteHostID,
-		SrcAddress:   srcIP,
-		DstAddress:   dstIP,
-		SrcPort:      srcPort,
-		DstPort:      dstPort,
-		Throughput:   1,
-		Direction:    direction,
-		Protocol:     packet.Protocol,
-		StartTime:    sqltime.New(packet.Timestamp.AsTime()),
-		EndTime:      sqltime.New(packet.Timestamp.AsTime()),
+		HostID:        packet.MachineID,
+		RemoteHostID:  remoteHostID,
+		OriginAddress: originAddress,
+		SrcAddress:    srcIP,
+		DstAddress:    dstIP,
+		SrcPort:       srcPort,
+		DstPort:       dstPort,
+		Throughput:    1,
+		Direction:     direction,
+		Protocol:      packet.Protocol,
+		StartTime:     sqltime.New(packet.Timestamp.AsTime()),
+		EndTime:       sqltime.New(packet.Timestamp.AsTime()),
 	}
 	database.DB.Create(&flow)
 	sendWSNetFlow(*flow)

@@ -1,0 +1,74 @@
+/*
+    Main CSS for network visualization tool.
+*/
+
+body,
+html,
+#viz {
+    padding: 0px 0px 0px 0px;
+    margin: 0px 0px 0px 0px;
+    height: 100%;
+    width: 100%;
+}
+
+#viz {
+    height: 100%;
+}
+
+#timeline-bar {
+    background-color: #eaeaea;
+    border-top: 1px solid silver;
+
+    padding: 5px 5px 5px 5px;
+    vertical-align: middle;
+    line-height: 100%;
+    text-align: center;
+
+    position: fixed;
+    left: 0px;
+    bottom: 0px;
+    width: 100%;
+}
+
+#timeline-bar button {
+    width: 64px;
+    font-size: large;
+    margin-bottom: 5px;
+}
+
+#timeline {
+    background-color: white;
+    font-size: medium;
+}
+
+#control-box {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    opacity: 0.3;
+    padding: 10px 10px;
+    z-index: 5;
+}
+
+#control-box:hover {
+    cursor: pointer;
+    opacity: 0.6;
+}
+
+.custom-contextmenu-style * {
+    font-weight: normal;
+}
+
+.custom-contextmenu-style {
+    z-index: 5 !important;
+}
+
+/* Color picker CSS for contextMenu */
+
+.evo-pop {
+    width: 215px;
+}
+
+div.evo-pointer.evo-colorind {
+    border-width: 2px;
+}

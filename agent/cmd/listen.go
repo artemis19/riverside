@@ -117,25 +117,36 @@ func Listen(cmd *cobra.Command, args []string) {
 	// Create wait group since we need to wait for each interface's goroutine to finish
 	var wg sync.WaitGroup
 
-	interfaces, err := utils.GetNetInterfaceNames()
-	if err != nil {
-		log.Fatalf("Failed to find interfaces %v\n.", err)
-	}
+	givenInterface := viper.Get("interface").(string)
 
-	for _, interfaceName := range interfaces {
-		// This was removes virtual, docker, and loopback interfaces.
-		// If you would like to listen on these, simply add them in.
-		// if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") {
-		// 	// Ignore virtual, docker, and loopback interfaces
-		// 	continue
-		// }
-		
-		// Add every interface to our group
+	if givenInterface != "" {
 		wg.Add(1)
 		defer wg.Done()
 
 		// Goroutine so all of the device's interfaces can listen
-		go ListenOnInterface(interfaceName, int32(snapLen), serverStream, extraFilter)
+		go ListenOnInterface(givenInterface, int32(snapLen), serverStream, extraFilter)
+	} else {
+
+		interfaces, err := utils.GetNetInterfaceNames()
+		if err != nil {
+			log.Fatalf("Failed to find interfaces %v\n.", err)
+		}
+
+		for _, interfaceName := range interfaces {
+			// This was removes virtual, docker, and loopback interfaces.
+			// if strings.HasPrefix(interfaceName, "veth") || strings.HasPrefix(interfaceName, "docker") || strings.HasPrefix(interfaceName, "lo") || strings.HasPrefix(interfaceName, "vmnet") || strings.HasPrefix(interfaceName, "br-") {
+			// 	// Ignore virtual, docker, and loopback interfaces
+			// 	continue
+			// }
+
+			// Add every interface to our group
+			wg.Add(1)
+			defer wg.Done()
+
+			// Goroutine so all of the device's interfaces can listen
+			go ListenOnInterface(interfaceName, int32(snapLen), serverStream, extraFilter)
+
+		}
 
 	}
 
