@@ -8,7 +8,7 @@ Riverside provides a web-based, dynamic network security visualization of real-t
 
 ## Running Riverside
 
-*__Important Note: Riverside is still being actively developed and tested in various environments.__*
+*__Important Note: Riverside is still being actively developed and tested in various environments. Session management has not yet been completely implemented or tested.__*
 
 This tool uses gRPC functionality to communicate between a server and agent-installed hosts. Protocol buffers are used to structure and serialize data for agent and server communications. The agent and server binaries are written in Golang and have been tested successfully on Windows and various Linux architectures. The GORM library was used to handle all database functionality, and the supported database type is Postgres but can be easily changed with one line in the server source code. The client, or frontend, communicates with the server via the Gorilla WebSockets library to display batched data in a web-based network visualization.
 
