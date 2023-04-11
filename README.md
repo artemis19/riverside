@@ -21,4 +21,4 @@ The frontend layout was built using the [vis.js](https://visjs.org/) library alo
 
 ## Riverside Setup
 
-All of the instructions for Riverside's setup and deployment are located in the [Riverside Wiki](https://github.com/artemis19/riverside/wiki).
+All of the instructions for Riverside's setup and deployment are located in the [Riverside Wiki](https://github.com/artemis19/riverside/wiki/Riverside-Deployment).
